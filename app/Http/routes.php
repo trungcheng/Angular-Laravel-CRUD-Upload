@@ -15,8 +15,9 @@ Route::get('/', function () {
     return view('app');
 });
 
-Route::group(['middleware' => 'cors','prefix' => 'api'], function(){
+Route::group(['prefix' => 'api'], function(){
 	Route::resource('members', 'MemberController');
+	Route::controller('members/upload-img', 'MemberController');
 });
 
 // Templates

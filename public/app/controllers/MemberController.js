@@ -30,15 +30,15 @@ app.controller('MemberController', function($window, $state, $stateParams, $scop
     }
 
     $scope.add = function(){
-        console.log($scope.files);
         $http({
             method: 'POST',
             url: API_URL,
+            headers: {'Content-Type': undefined},
             data: {
-                name: $scope.Member.name,
-                address: $scope.Member.address,
-                age: $scope.Member.age,
-                file: $scope.files
+                name: $scope.Member.name1,
+                address: $scope.Member.address1,
+                age: $scope.Member.age1,
+                photo: $scope.files
             },
             transformRequest: function (data, headersGetter) {
                 var fd = new FormData();
@@ -51,13 +51,30 @@ app.controller('MemberController', function($window, $state, $stateParams, $scop
             }
         }).success(function(response){
             if(response.status){
-                alert(response.message);
                 $(".modal").modal("hide");
                 $state.reload();
             }else{
                 alert(response.message);
-                $(".modal").modal("hide");
-                $state.reload();
+            }
+        })
+    }
+
+    $scope.edit = function(id){
+        $http.get(API_DELETE + id).success(function(response){
+            $scope.MemberEdit = response.data[0];
+        })
+    }
+
+    $scope.postImg = function(){
+        $http({
+            method: 'POST',
+            url: '/api/members/upload-img/' + $scope.MemberEdit.id,
+            data: $scope.myFile
+        }).success(function(response){
+            if(response.status){
+                console.log('upload success');
+            }else{
+                alert(response.message);
             }
         })
     }
@@ -65,31 +82,30 @@ app.controller('MemberController', function($window, $state, $stateParams, $scop
     $scope.update = function(){
         $http({
             method: 'PUT',
-            url: API_DELETE + $stateParams.id,
+            url: API_DELETE + $scope.MemberEdit.id,
             data: {
-                name: $scope.Member.name,
-                address: $scope.Member.address,
-                age: $scope.Member.age,
-                file: $scope.myFile
+                name: $scope.MemberEdit.name,
+                address: $scope.MemberEdit.address,
+                age: $scope.MemberEdit.age
             }
         }).success(function(response){
             if(response.status){
-                alert(response.message);
                 $(".modal").modal("hide");
                 $state.reload();
             }else{
                 alert(response.message);
-                $(".modal").modal("hide");
-                $state.reload();
             }
         })
     }
 
-    $scope.remove = function(id){
+    $scope.remove = function(id, index){
         var deleteUser = $window.confirm('Are you sure you want to delete this member?');
         if(deleteUser){
-            $http.delete(API_DELETE + id).success(function(response){
-                $state.reload();
+            $http({
+                method: 'DELETE',
+                url: API_DELETE + id,
+            }).success(function(response){
+                $scope.members.splice(index, 1);
             })
         }
     }

@@ -2,16 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Member;
 use Illuminate\Http\Request;
-use Illuminate\Http\UploadedFile;
-use Symfony\Component\HttpFoundation\File;
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
-use App\Member;
 
 class MemberController extends Controller
 {
-
     public function index()
     {
         $members = Member::all();
@@ -33,50 +30,80 @@ class MemberController extends Controller
 
     public function store(Request $request)
     {
-    	if ($request->hasFile('file')) {
-            $file = $request->file('file');
-            $folder = __DIR__.'/../../../public/uploads/';
-            
-            $filename = $file->getClientOriginalName();
-            $pathfile = rand(100,1000).'-'.$filename;
+        $member = new Member();
+    	if ($request->hasFile('photo')) {
 
-            $ext = pathinfo($filename, PATHINFO_EXTENSION);
+            $file = $request->file('photo');
+            $folder = public_path('uploads');
+
+            $filename = $file->getClientOriginalName();
+            $pathfile1 = rand(100,10000).'-'.$filename;
+
+            $ext = $file->getClientOriginalExtension();
             $allowed = array('jpg','png','gif');
 
-            if(in_array($ext,$allowed)){
-                $file->move($folder, $pathfile);
-                $member = new Member();
-                $member->photo = 'uploads/'.$pathfile;
+            if(in_array($ext, $allowed)){
+                
                 $member->name = $request->name;
                 $member->address = $request->address;
                 $member->age = $request->age;
-         
+                $member->photo = 'public/uploads/'.$pathfile1;
                 $member->save();
-                return \Response::json([
+
+                $file->move($folder, $pathfile1);
+                return response()->json([
                     'status' => true,
                     'message' => 'Add new member success !'
-                ]); 
+                ]);
             }else{
-                return \Response::json([
+                return response()->json([
                     'status' => false,
                     'message' => 'Photo format wrong !'
                 ]);
             }
         }else{
-            $member = new Member();
             $member->name = $request->name;
             $member->address = $request->address;
             $member->age = $request->age;
      
             if($member->save()){
-                return \Response::json([
+                return response()->json([
                     'status' => true,
                     'message' => 'Add new member success but not photo !'
                 ]);
             }else{
-                return \Response::json([
+                return response()->json([
                     'status' => false,
                     'message' => 'Create member failed !'
+                ]);
+            }
+        }
+    }
+
+    public function postUploadImg(Request $request){
+        $member = Member::find($id);
+        if ($request->hasFile('photo')) {
+            $file = $request->file('photo');
+            $folder = public_path('uploads');
+
+            $filename = $file->getClientOriginalName();
+            $pathfile = rand(100,10000).'-'.$filename;
+
+            $ext = $file->getClientOriginalExtension();
+            $allowed = array('jpg','png','gif');
+
+            if(in_array($ext, $allowed)){
+                $member->photo = 'public/uploads/'.$pathfile;
+                $member->save();
+
+                $file->move($folder, $pathfile);
+                return response()->json([
+                    'status' => true,
+                ]);
+            }else{
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Photo format wrong !'
                 ]);
             }
         }
@@ -85,12 +112,12 @@ class MemberController extends Controller
     public function edit($id)
     {
         $member = Member::find($id);
-        return response($member);
+        return response()->json($member);
     }
 
     public function show($id){
         $member_detail = Member::where('id', '=' , $id)->get();
-        return \Response::json([
+        return response()->json([
             'data' => $member_detail,
             'message' => 'Show member success'
         ],200);
@@ -99,48 +126,21 @@ class MemberController extends Controller
     public function update(Request $request,$id)
     {
     	$mem = Member::find($id);
-
-        if($request->hasFile('file')) {
-            $photo = $request->file('file');
             
-            $name = $photo->getClientOriginalName();
-            $nameFile = rand(1,100000).'-'.$name;
-            $path = 'uploads/'.$nameFile;
-            
-            $folder = __DIR__.'/../../../public/uploads/';
-            $file->move($folder, $nameFile);
-            
-            $mem->photo = $path;
-            $mem->name = $request->name;
-            $mem->address = $request->address;
-            $mem->age = $request->age;
-     
-            if($mem->save()){
-                return \Response::json([
-                    'status' => true,
-                    'message' => 'Update member success, have image !'
-                ]);
-            }else{
-                return \Response::json([
-                    'status' => false,
-                    'message' => 'Update member failed !'
-                ]);
-            }
+        $mem->name = $request->name;
+        $mem->address = $request->address;
+        $mem->age = $request->age;
+ 
+        if($mem->save()){
+            return \Response::json([
+                'status' => true,
+                'message' => 'Update member success, have image !'
+            ]);
         }else{
-            $mem->name = $request->name;
-            $mem->address = $request->address;
-            $mem->age = $request->age;
-            if($mem->save()){
-                return \Response::json([
-                    'status' => true,
-                    'message' => 'Update member success, not change image !'
-                ]);
-            }else{
-                return \Response::json([
-                    'status' => false,
-                    'message' => 'Update member failed, not change image !'
-                ]);
-            }
+            return \Response::json([
+                'status' => false,
+                'message' => 'Update member failed !'
+            ]);
         }
     }
 
@@ -148,7 +148,8 @@ class MemberController extends Controller
     {
         $member = Member::find($id);
         $member->delete();
-        return \Response::json([
+        return response()->json([
+            'data' => $member,
             'message' => 'Delete member success !'
         ]);
     }
