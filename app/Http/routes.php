@@ -17,8 +17,8 @@ Route::get('/', function () {
 
 Route::group(['prefix' => 'api'], function(){
 	Route::resource('members', 'MemberController');
-	Route::controller('members/upload-img', 'MemberController');
 });
+Route::post('uploadImg', 'MemberController@uploadImg');
 
 // Templates
 Route::group(array('prefix'=>'/templates/'),function(){

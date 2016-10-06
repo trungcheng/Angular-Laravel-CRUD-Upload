@@ -1,8 +1,10 @@
 var app = angular.module('TestApp');
 
-app.controller('MemberController', function($window, $state, $stateParams, $scope, $http, API_URL, API_DELETE){
+app.controller('MemberController', function($window, $state, $stateParams, $scope, $http, API_UL, API_URL, API_DELETE){
 
     $scope.Member = {};
+
+    $scope.MemberEdit = {};
 
     $scope.ageNum = /^[1-9]{2}$/;
 
@@ -65,14 +67,24 @@ app.controller('MemberController', function($window, $state, $stateParams, $scop
         })
     }
 
-    $scope.postImg = function(){
+    $scope.uploadImg = function(){
         $http({
             method: 'POST',
-            url: '/api/members/upload-img/' + $scope.MemberEdit.id,
-            data: $scope.myFile
+            url: API_UL,
+            headers: {'Content-Type': undefined},
+            data: $scope.MemberEdit,
+            transformRequest: function (data, headersGetter) {
+                var fd = new FormData();
+                angular.forEach(data, function (value, key) {
+                    fd.append(key, value);
+                });
+                var headers = headersGetter();
+                delete headers['Content-Type'];
+                return fd;
+            }
         }).success(function(response){
             if(response.status){
-                console.log('upload success');
+                $scope.MemberEdit.photo = response.path;
             }else{
                 alert(response.message);
             }
@@ -86,7 +98,8 @@ app.controller('MemberController', function($window, $state, $stateParams, $scop
             data: {
                 name: $scope.MemberEdit.name,
                 address: $scope.MemberEdit.address,
-                age: $scope.MemberEdit.age
+                age: $scope.MemberEdit.age,
+                photo: $scope.MemberEdit.photo
             }
         }).success(function(response){
             if(response.status){

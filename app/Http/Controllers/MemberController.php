@@ -80,10 +80,11 @@ class MemberController extends Controller
         }
     }
 
-    public function postUploadImg(Request $request){
-        $member = Member::find($id);
-        if ($request->hasFile('photo')) {
-            $file = $request->file('photo');
+    public function uploadImg(Request $request)
+    {
+
+        if ($request->hasFile('myFile')) {
+            $file = $request->file('myFile');
             $folder = public_path('uploads');
 
             $filename = $file->getClientOriginalName();
@@ -93,12 +94,10 @@ class MemberController extends Controller
             $allowed = array('jpg','png','gif');
 
             if(in_array($ext, $allowed)){
-                $member->photo = 'public/uploads/'.$pathfile;
-                $member->save();
-
                 $file->move($folder, $pathfile);
                 return response()->json([
-                    'status' => true,
+                    'path' => 'public/uploads/'.$pathfile,
+                    'status' => true
                 ]);
             }else{
                 return response()->json([
@@ -130,6 +129,7 @@ class MemberController extends Controller
         $mem->name = $request->name;
         $mem->address = $request->address;
         $mem->age = $request->age;
+        $mem->photo = $request->photo;
  
         if($mem->save()){
             return \Response::json([
