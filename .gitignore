@@ -1,6 +1,11 @@
-*.json
-*.xml
-*.md
-*.lock
-*.env
-artisan
+ *~
+.DS_Store
+.project
+.settings
+.classpath
+.metadata
+.json
+.lock
+.md
+.xml
+.env
