@@ -1,0 +1,8 @@
+*.json
+*.env
+*.lock
+*.md
+*.xml
+artisan
+server.php
+gulpfile.js
