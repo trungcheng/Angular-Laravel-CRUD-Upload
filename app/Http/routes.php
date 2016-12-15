@@ -19,6 +19,7 @@ Route::group(['prefix' => 'api'], function(){
 	Route::resource('members', 'MemberController');
 });
 Route::post('uploadImg', 'MemberController@uploadImg');
+Route::get('checkDuplicate/{name}', 'MemberController@checkDuplicate');
 
 // Templates
 Route::group(array('prefix'=>'/templates/'),function(){

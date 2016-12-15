@@ -8,6 +8,26 @@ app.controller('MemberController', function($window, $state, $stateParams, $scop
 
     $scope.ageNum = /^[1-9]{2}$/;
 
+    $scope.sortType     = 'name';
+    
+    $scope.sortReverse  = false;
+
+    $scope.checkName = function(){
+        if($scope.Member.name1){
+            $scope.blured =  true;
+            $http({
+                method: 'GET',
+                url: 'checkDuplicate/' + $scope.Member.name1,
+            }).success(function(response){
+                if(response.status){
+                    $scope.nameStatus = true;
+                } else {
+                    $scope.nameStatus = false;
+                }
+            })
+        }
+    }
+
     $scope.imageUpload = function(event){
         var files = event.target.files;
         var file = files[files.length-1];

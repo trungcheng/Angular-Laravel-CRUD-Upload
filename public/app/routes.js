@@ -10,6 +10,6 @@ app.config(function($stateProvider, $urlRouterProvider) {
         })
 });
 
-app.constant('API_URL', 'http://localhost:8000/api/members');
-app.constant('API_UL', 'http://localhost:8000/uploadImg');
-app.constant('API_DELETE', 'http://localhost:8000/api/members/');
+app.constant('API_URL', 'api/members');
+app.constant('API_UL', 'uploadImg');
+app.constant('API_DELETE', 'api/members/');

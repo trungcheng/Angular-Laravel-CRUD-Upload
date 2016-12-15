@@ -108,6 +108,21 @@ class MemberController extends Controller
         }
     }
 
+    public function checkDuplicate($name){
+        $member = Member::where('name','=',$name)->get();
+        if(count($member) > 0){
+            return response()->json([
+                'status' => false,
+                'message' => 'This name has been already exist !'
+            ]);
+        }else{
+            return response()->json([
+                'status' => true,
+                'message' => 'OK'
+            ]);
+        }
+    }
+
     public function edit($id)
     {
         $member = Member::find($id);
